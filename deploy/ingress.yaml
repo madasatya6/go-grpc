@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    #kubernetes.io/ingress.class: nginx
+    #nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.org/rewrites: "serviceName=vms-be rewrite=/"
+  name: vms-be
+  namespace: vms
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.vms.app.co.id
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vms-be
+                port:
+                  number: 5202
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    #kubernetes.io/ingress.class: nginx
+    #nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.org/rewrites: "serviceName=vms-ws rewrite=/"
+  name: vms-ws
+  namespace: vms
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: websocket.vms.app.co.id
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vms-ws
+                port:
+                  number: 5203
+---

@@ -1,0 +1,12 @@
+.env
+.DS_Store
+/.idea
+/.ruby-gemset
+/.ruby-version
+/deploy/_output
+/experiment
+/public
+/Gemfile*
+/vendor
+/credential
+dump.rdb

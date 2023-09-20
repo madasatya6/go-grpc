@@ -1,0 +1,12 @@
+development:
+  dialect: postgres
+  datasource: dbname=app_development sslmode=disable
+  dir: migration
+staging:
+  dialect: postgres
+  datasource: dbname=app_staging sslmode=disable
+  dir: migration
+production:
+  dialect: postgres
+  datasource: dbname=app_production sslmode=disable
+  dir: migration

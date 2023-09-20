@@ -1,0 +1,37 @@
+syntax="proto3";
+
+import "proto/user.proto";
+// import "google/protobuf/any.proto";
+
+option go_package="model/proto/transaction";
+
+package transaction;
+
+message TransactionRequest{
+  uint32 total_price = 1;
+  bool   is_wrapped = 2;
+  bool   is_delivery = 3;
+  string courier = 4;
+  repeated ProductTransactionRequest products = 5;
+}
+
+message ProductTransactionRequest{
+  uint32 product_id = 1;
+  uint32 total = 2;
+  uint32 product_attribute_id = 3;
+}
+
+message TransactionResponse{
+  int32 http_status = 1;
+  string message = 2;
+  DataResponse data = 3;
+  user.User user = 4;
+}
+
+message DataResponse{
+  bytes data = 1; // seperti interface
+}
+
+service TransactionService{
+  rpc ApproveTransactions(TransactionRequest) returns (TransactionResponse);
+}

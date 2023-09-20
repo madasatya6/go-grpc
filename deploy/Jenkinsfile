@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    tools {
+        dockerTool "docker"
+    }
+    environment {
+        CI = 'true'
+    }
+    stages {
+        stage('Checkout') {
+            when {
+                branch 'main'
+            }
+            steps {
+                checkout scm
+            }
+        }
+        stage('build') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'docker build -t registry.app.co.id/vms/be/api:latest -f ./deploy/api/Dockerfile .'
+                sh 'docker build -t registry.app.co.id/vms/be/worker:latest -f ./deploy/worker/Dockerfile .'
+                sh 'docker build -t registry.app.co.id/vms/be/websocket:latest -f ./deploy/websocket/Dockerfile .'
+                sh 'docker build -t registry.app.co.id/vms/be/cron-meeting:latest -f ./deploy/cron-meeting/Dockerfile .'
+                sh 'docker login registry.app.co.id -u corporate -p SkXkvmX1RmykEVTFgZos'
+                sh 'docker push registry.app.co.id/vms/be/api:latest'
+                sh 'docker push registry.app.co.id/vms/be/worker:latest'
+                sh 'docker push registry.app.co.id/vms/be/websocket:latest'
+                sh 'docker push registry.app.co.id/vms/be/cron-meeting:latest'
+            }
+        }
+        stage('deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'
+                sh 'chmod u+x ./kubectl'
+                sh './kubectl get pods'
+                catchError {
+                    sh './kubectl apply -f deploy/api/vms-be.yaml'
+                }
+                catchError {
+                    sh './kubectl apply -f deploy/websocket/vms-ws.yaml'
+                }
+                catchError {
+                    sh './kubectl apply -f deploy/worker/vms-wk.yaml'
+                }
+                catchError {
+                    sh './kubectl apply -f deploy/cron-meeting/vms-cron-meeting.yaml'
+                }
+                catchError {
+                    sh './kubectl -n vms rollout restart deployment/vms-be'
+                }
+                catchError {
+                    sh './kubectl -n vms rollout restart deployment/vms-ws'
+                }
+                catchError {
+                    sh './kubectl -n vms rollout restart deployment/vms-wk'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

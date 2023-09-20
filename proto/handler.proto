@@ -1,0 +1,35 @@
+syntax="proto3";
+
+import "proto/user.proto";
+import "proto/healthz.proto";
+import "proto/transaction.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
+// protobuf digenerate, maka akan mengikuti struktur folder berikut
+option go_package="model/proto/handler";
+
+package handler;
+
+// Belajar proto syntax di https://protobuf.dev/programming-guides/proto3/
+// generate file.proto => protoc --go_out=plugins=grpc:. ./proto/*.proto
+// selain protobuf compiler butuh:
+// go get -u github.com/golang/protobuf/protoc-gen-go
+// go get -u github.com/golang/protobuf
+
+message Response{
+  bool Status = 1;
+  string Message = 2;
+  google.protobuf.Empty Data = 3;
+}
+
+// Define RPC service
+service HandlerService{
+  rpc Healthz(healthz.HealthCheckRequest) returns (healthz.HealthCheckResponse);
+  rpc GreetUser(user.GreetingRequest) returns (user.GreetingResponse) {
+    option (google.api.http) = {
+      get: "/v1/user/greet"
+    };
+  }
+  rpc ApproveTransactions(transaction.TransactionRequest) returns (transaction.TransactionResponse);
+}

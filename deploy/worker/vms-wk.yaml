@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: vms
+  name: vms
+spec:
+  finalizers:
+    - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vms-config
+  namespace: vms
+data:
+  firebase-service-account.json: |
+    {
+      "type": "service_account",
+      "project_id": "app-vms",
+      "private_key_id": "b9bd25821f9f182f868ba96a39edce3790cec102",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC7lPJuN1eUwJGC\n9/YkrIsnzuIL5BY00wgRwaKkiCZ/HDFBSsMwRgjHGh3lKcW0+LsJ7mwKgdSrnTiB\nsyjF4f3Iejm+oHVGS7Fn/y+MJaHHdQIVq/WCTCfngofY4uvpXiv4beJ4IIb+ltyC\nq0J5NoBaZW9PKpp4+WEPIlGJZK9Tpf/pWKN+2zZPqtSpHt1moV7RR+Y7JjRv2jd7\nJqaUQ+PPCmJfOQOJKPvAxP1bsp1kdOlq6IObHJvK58yNEbBHu4Hrlgx/gRn+Sw5F\n0qj3M6yPWDUH5bLHuUGT5GvN6HsAyVP8i5gkEIRtLt2go7Hx9OXUIZOMtDMF9yUY\nxs40odc7AgMBAAECggEABwXpLb4Us6dY7+07BpR87wHDW7V4v19HU8dvnAlmFUw+\norabA6ut4ZjDA34LvqdoPeXOMS1fzHY8L172+0P5raIl4HeIWjzY+vz0EH6l6kL8\n9GvoWK4++V9vdFmmFKojGQafoJ17uY7A/jpNjR6J1o9zY22xfS8rWx/8qz3vhNNQ\nqRjLzNlbiohSqQGgIKPYi5cjzh/YBDEo0FKzyWCl7MN+9gepL97upZE+4rIlPgNS\nImJuUPDOhf1+if3EF23x4LROcWDWKaMeF2qZGEIXr2wmG5ELOgsgZLyBIHCaaDU3\nlfg2siAtw9CL1FAb+57lUvQzI7+f8P7etTQenTlcAQKBgQDqwoNEG0HtRAfZDyug\nDOWdg3VX4ZJ+EUOtH5anKmbP8//MTLVAnLpRw9HoalrxCFkv9vU6igcn6leXmUtH\nKlXaDK/Fd+HK/JPJC6buIWaff0Fe2+sispDYsWu50TBlfRnqWjnXGNPMd5B99izE\natQSUHKraQ4tLHWqYQjhFmCP+wKBgQDMjbOYRZv8r6j/wVPw7Bk7V2Tr/0rQib+D\nKwY1epImm3WhHw8cZkd4gzh9VxAE0QUsZcMKeUS54AZfz8skQB7ueu48a7yRwmMe\nNgt7lJqeuwgSDtq7wjjZOCsOmELQ/PzRg5PNFMY1k05IvhXWuOg1sPQGMTEGYY8a\nbUgzFr7xwQKBgQDE/mhMNFtEEDxNpm9DJM9hN7i1//F/nFkf40v2Bpyzj9psw0mt\naFbo2dtAnk6lyA2fNCpf7wdGNV0/N0F1/E6CZPbyS0DLptsUb5SqapjE6nIeeYh8\nWz80ttzg1ms4HpwqjX/PwWOpRgOXz4WNZN+EZsFymPtuaMpsKHTc/HwXFQKBgQCd\noSjf0+yDyb368LlF9DrxbsR31HCLyUrKwrHzLjRICg6Yjf2wDeVPqhczB49xlr1c\n3EJz5MWgU1G2LcPGeJ8deZ/y8bcLv/dvxYgNwJNydICgoc/PVrlGMzGC+rSqpfoR\nXkrchADGMnDmP41GvZE8JtO1ndzApReI7uPvcrzMQQKBgQC1ILItVHi22caCi+IT\n+wzLgRlB5qhZdhE2iJI6+tKgl3KlqE8LJgrRrQKeLyIm2avNKPGvo654ezSC4iKK\nsO+JTcmvArp7dVr6AC4JnYUO5vHFau6ZISErjJfyrgjWl0jb9lKv7/p0+eBcsYx9\nH6llZshhfKmstHAUEr2vrYcrLg==\n-----END PRIVATE KEY-----\n",
+      "client_email": "firebase-adminsdk-1m4nn@app-vms.iam.gserviceaccount.com",
+      "client_id": "105761584979676567117",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-1m4nn%40app-vms.iam.gserviceaccount.com"
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vms-wk
+  namespace: vms
+  labels:
+    app: vms-wk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vms-wk
+  template:
+    metadata:
+      labels:
+        app: vms-wk
+        logging: filebeat
+    spec:
+      containers:
+        - name: vms-wk
+          image: registry.app.co.id/vms/be/worker:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: configs
+              mountPath: /app/firebase-service-account.json
+              subPath: firebase-service-account.json
+          env:
+            - name: ENV
+              value: staging
+            - name: POSTGRES_HOST
+              value: "10.98.85.118"
+            - name: POSTGRES_PORT
+              value: "5433"
+            - name: POSTGRES_DATABASE
+              value: vms
+            - name: POSTGRES_USERNAME
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password.1
+            - name: REDIS_HOST
+              value: "10.105.77.129"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: MINIO_ENDPOINT
+              value: "172.16.4.4:9000"
+            - name: MINIO_USERNAME
+              value: minio
+            - name: MINIO_PASSWORD
+              value: P@ssw0rd.1
+            - name: MINIO_SSL
+              value: "false"
+            - name: CDN_BASE_URL
+              value: https://cdn.app.co.id
+            - name: SMTP_HOST
+              value: smtp.office365.com
+            - name: SMTP_PORT
+              value: "587"
+            - name: SMTP_PASSWORD
+              value: P@ssw0rd2021
+            - name: SMTP_USERNAME
+              value: "vms@app.co.id"
+            - name: SMTP_SENDER
+              value: "vms@app.co.id"
+            - name: VERIHUBS_APP_ID
+              value: 392f9647-c032-4264-9a47-3a81ae5a3a45
+            - name: VERIHUBS_API_KEY
+              value: d1Ijk956+g2ZUvoA8WSoN5b5TIMmuPKY
+            - name: RSA_PRIVATE_KEY
+              value: "-----BEGIN RSA PRIVATE KEY-----\nMIIEpQIBAAKCAQEAq9e6MqRyvp8AAuaJdtpKCddJJ2ypJ3uON4boS/Ao6lOD44/3\nY27CGaAnIWuKXBmC6ECfStxIz4l5/zgRPq61PtZLnX9upNNDxZwlBX2zv257J/vT\nQkYW8dgbWAaLiNGvAuIOt11OhssBuA/N8WpfKIbFCL40sZ7XZbiIx+BW2ms8OUtU\nhZgit8krBm7ymHpVGsqicygOCkT2Sx1L8FehvBa8JZhNnF5WMbBCkdugWDNxzOOY\ndvA/jgCpsd7smz6t0NsbxGyWCiLMBYqmAe3B6tYX/DcfQgZxY8zlPFAo7Snko64d\nH5cdAe4+QPJL8Dj7jfH5qhc23snWIxhWEf3JqwIDAQABAoIBAHY1+Y162MBOqnhU\nVH3hHgt1AIrRUe+qLCQAdu4+MDc56kFxuNG60GVGaYSw8MX4ergANFQQAzpZLQYn\ncJ15G481ZWDb16Yk+rsGdeU4Gp12h9vyfNpbUs9dRTohjn05GTZXgZ4b3rgVEIKo\nxJfs/7bmNsaT6bXCOhRshBNTPQwUlhCw6vgoRvmJVZAx7vQiBjS8HD71IUrCbWRE\nvMqQBtNarNdvUmkVQ/8ixffSkoph2dES43T12EjTpPvU3sQCZCfAIbf6mwCvXNWd\nWZehcMQ2y1RI7d+pxG8FcmtjumWn4NzDnmGs4QHMsGHH2su9PHJ/LviyntRrW+Yc\nGimVAikCgYEA0eXYYdyi28drJ/IxNKJfXNrc6HjPGjD4yydxl2YS1nd6acEw3KQI\npD40xgSQWlCpWW10bYl0DwbMECr868JLLI9FwcpEUgMr61Gtwf71IeDsWAj2yMi7\nc79Pt/Mf6kWcQeD4gTSldHPKuoqvbW8hOy+AvelKvhrh7Bast+dfWKUCgYEA0ZYd\nG/VsGOHisX0UNZI0gmJcWQke3dnsew2r+67rEqYycOVh9mYvfvfPhVPO8U1UozGF\nL4FdyqdPxxZ5R1E5jYsg7Jw6kT8PMgjflMCc8G+JWCGbwmZrf8mO770MzSEjT2i+\nWOko03aRwRTkAglSzk+Z3ZDgDbiiGKjzml0duA8CgYEAyqCrklWv9qF+BbMd42T4\n0KgMaHPv4qXyGBS86N5GQzpWN2+kHuxP11aiFaNkQ3vo8IbkxbXTD4qNRvJo9aO8\ndIjfW6RK7i1XobVZG5Voycrb/mSw8MYviB7g84DGh5+pqENpQzoym8gIpqqpjeih\nWQSTsUJcwEctYH/HP0YiWm0CgYEAuqj3Q+9QVtjXDTxYw11zZqwzkxiMZQmxk+aZ\nRY6Dzhg21FV26fwYUPxj1lrN9BrrRmzUMXsGDXb1llptqRauK2G98P0zLCj9X5KH\njfP90iWELPnBv2F4XFcm9l1pCUh6Kj8fSBBgS/VN2qjAaQ/kr9o1Lx/YbGAD/fJ7\nAv/reAECgYEAwCzoAGVjw9tGixIf+u/fJuhQfnvnlNcKL464RGGCRTTiMlKk3gnA\nyAaIVFRxXzeCVotqEQfz7ol7ZCyaVKlM7g1znd8qJXp6yqgAJRTABxStauKTK6Dn\nL6MVrYIKPbZpplOYbeTp7hbM25l29zBPd6Hp4ONdOSurWG4wA+/FByM=\n-----END RSA PRIVATE KEY-----"
+            - name: RSA_PUBLIC_KEY
+              value: "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq9e6MqRyvp8AAuaJdtpK\nCddJJ2ypJ3uON4boS/Ao6lOD44/3Y27CGaAnIWuKXBmC6ECfStxIz4l5/zgRPq61\nPtZLnX9upNNDxZwlBX2zv257J/vTQkYW8dgbWAaLiNGvAuIOt11OhssBuA/N8Wpf\nKIbFCL40sZ7XZbiIx+BW2ms8OUtUhZgit8krBm7ymHpVGsqicygOCkT2Sx1L8Feh\nvBa8JZhNnF5WMbBCkdugWDNxzOOYdvA/jgCpsd7smz6t0NsbxGyWCiLMBYqmAe3B\n6tYX/DcfQgZxY8zlPFAo7Snko64dH5cdAe4+QPJL8Dj7jfH5qhc23snWIxhWEf3J\nqwIDAQAB\n-----END PUBLIC KEY-----"
+            - name: DEVICE_CLIENT_ID
+              value: "4754ef9b-e6f9-4a79-b4e1-141127436c52"
+            - name: DEVICE_CLIENT_SECRET
+              value: "3fa60185-f98b-4848-8d5d-652249dba658"
+            - name: FIREBASE_CONFIG_PATH
+              value: "./firebase-service-account.json"
+            - name: GOOGLE_AUDIENCE_ID
+              value: "913325443720-7os1rqqmelmrhucan1qum841sofqfkdj.apps.googleusercontent.com"
+            - name: GOOGLE_AUDIENCE_WEB_LOCAL_ID
+              value: 659050926433-sbp2212pdnvkc5a6vhipj8f7gl07fg4u.apps.googleusercontent.com
+            - name: GOOGLE_AUDIENCE_WEB_PRODUCTION_ID
+              value: 697526978575-agno1plhb2ifopkcjvneon8qnk9div64.apps.googleusercontent.com
+            - name: SENTRY_DSN
+              value: "https://fce3dcdf8bc64e7c8dbd129bb0d95bbd@sentry.app.co.id/2"
+            - name: SENTRY_ENV
+              value: "production"
+      volumes:
+        - name: configs
+          configMap:
+            name: vms-config
+      imagePullSecrets:
+        - name: app-registry
+---
+

@@ -1,0 +1,32 @@
+syntax="proto3";
+
+// Definisi Package di Golang. Ketika 
+// protobuf digenerate, maka akan mengikuti struktur folder berikut
+option go_package="model/proto/user";
+
+// Definisi package
+package user;
+
+// Request Payload
+// Angka 1 atau 2 harus unique dalam setiap struct
+// Belajar proto syntax di https://protobuf.dev/programming-guides/proto3/
+// generate file.proto => protoc --go_out=plugins=grpc:. ./proto/*.proto
+// selain protobuf compiler butuh:
+	// go get -u github.com/golang/protobuf/protoc-gen-go
+	// go get -u github.com/golang/protobuf
+message GreetingRequest{
+  string name = 1;
+  string salutation = 2;
+}
+
+// Response Payload
+message GreetingResponse{
+  string GreetingMessage = 1;
+}
+
+message User{
+  uint64 id = 1;
+  string name = 2;
+  int32 age = 3;
+  string address = 4;
+}
